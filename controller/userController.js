@@ -114,7 +114,7 @@ const sendEmailForResetPass = async (req, res, next) => {
         else {
             res.send({
                 status: 401,
-                msg: "User not found with this email, please register user",
+                msg: "User not found with this email, please register",
             });
         }
     } catch (error) {

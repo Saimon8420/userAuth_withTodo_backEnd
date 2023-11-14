@@ -17,7 +17,7 @@ app.get("/", (req, res) => {
     res.sendFile("/view/index.html", { root: __dirname });
 })
 // user router
-app.use('/user', userRoute);
+app.use("/user", userRoute);
 // todo router
 app.use("/todo", todoRoute);
 
