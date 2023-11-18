@@ -44,7 +44,7 @@ const loginUser = async (req, res) => {
         if (matched) {
             const token = jwt.sign({
                 data: findUser._id,
-            }, process.env.JWT_SECRET, { expiresIn: '24h' });
+            }, process.env.JWT_SECRET, { expiresIn: "1h" });
             res.send({ status: 200, msg: "user login successful", accessToken: token, userData: findUser });
         }
         else {
@@ -60,8 +60,16 @@ const loginUser = async (req, res) => {
 const getUserData = async (req, res) => {
     try {
         const userData = req.userData;
-        if (userData?.length !== 0) {
-            res.send({ status: 201, data: userData });
+        if (userData) {
+            if (userData?._id) {
+                res.send({ status: 201, data: userData, expireTime: req.expireStamp });
+            }
+            else {
+                res.send({
+                    status: 401,
+                    data: userData,
+                });
+            }
         }
         else {
             res.send({
@@ -109,14 +117,14 @@ const sendEmailForResetPass = async (req, res, next) => {
         const findUser = await userModel.findOne({ email: email });
         if (findUser) {
             req.emailAdd = email;
-            next();
+            return next();
         }
-        else {
+        else if (!findUser) {
             res.send({
                 status: 401,
                 msg: "User not found with this email, please register",
-            });
-        }
+            })
+        };
     } catch (error) {
         console.log(error);
     }
@@ -126,20 +134,35 @@ const sendEmailForResetPass = async (req, res, next) => {
 const resetPassword = async (req, res) => {
     try {
         const { token, password } = req.body;
-        const decodedEmail = jwt.verify(token, process.env.JWT_SECRET_FORGET_PASS);
-        const findUser = await userModel.findOne({ email: decodedEmail?.data });
-        if (findUser) {
-            const hashedPass = await bcrypt.hash(password, saltRound);
-            const filter = { email: findUser?.email };
-            const updatePass = await userModel.findOneAndUpdate(filter, { password: hashedPass });
-            await updatePass.save();
-            res.send({ status: 200, msg: "password updated successfully,now you can login" });
+        if (token) {
+            const decodedEmail = jwt.verify(token, process.env.JWT_SECRET_FORGET_PASS);
+            console.log(decodedEmail);
+            const findUser = await userModel.findOne({ email: decodedEmail?.data });
+            if (findUser) {
+                const hashedPass = await bcrypt.hash(password, saltRound);
+                const filter = { email: findUser?.email };
+                const updatePass = await userModel.findOneAndUpdate(filter, { password: hashedPass });
+                await updatePass.save();
+                res.send({ status: 200, msg: "password updated successfully,now you can login" });
+            }
+            else {
+                res.send({ status: 401, msg: "User not found" });
+            }
         }
         else {
             res.send({ status: 401, msg: "User not found" });
         }
     } catch (error) {
-        console.log(error);
+        if (error.name === 'JsonWebTokenError') {
+            res.send({
+                status: 401,
+                msg: "Unauthorized",
+            });
+        } else {
+            // Handle other errors
+            console.log(error);
+            throw error;
+        }
     }
 }
 

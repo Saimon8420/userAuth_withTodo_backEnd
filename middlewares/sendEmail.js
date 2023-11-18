@@ -10,6 +10,9 @@ const sendEmail = async (req, res) => {
             data: email,
         }, process.env.JWT_SECRET_FORGET_PASS, { expiresIn: '15min' });
 
+        // for working url, the token should convert into btoa
+        const encodedToken = btoa(token);
+
         const transporter = nodemailer.createTransport({
             host: process.env.SMTP_HOST,
             port: process.env.SMTP_PORT,
@@ -27,7 +30,7 @@ const sendEmail = async (req, res) => {
                 html: `
                 <h2>Hello User</h2>
                 <p>Here is your reset password link, goto this link and reset your password. Note that this link will valid till next 15 minutes.</p>
-                <p>Please click here to <a href="${process.env.CLIENT_URL}/resetPassword/${token}" target="_blank">reset your password</a></p>
+                <p>Please click here to <a href="${process.env.CLIENT_URL}/reset/resetPass/${encodedToken}" target="_blank">reset your password</a></p>
                 `,
             });
 
@@ -35,7 +38,7 @@ const sendEmail = async (req, res) => {
         }
         main().catch(console.error);
 
-        res.send({ status: 200, msg: "Reset password link sended to user. And the link will valid for next 15 minutes", accessToken: token });
+        res.send({ status: 200, msg: "Reset password link sended to user. And the link will valid for next 15 minutes", accessToken: { encodedToken }, url: `${process.env.CLIENT_URL}/reset/resetPass/${encodedToken}` });
 
     } catch (error) {
         console.log(error);
