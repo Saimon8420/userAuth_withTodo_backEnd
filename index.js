@@ -14,7 +14,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.get("/", (req, res) => {
-    res.sendFile("/view/index.html", { root: __dirname });
+    // res.sendFile("/view/index.html", { root: __dirname });
+    res.send("Welcome to userAuth server with todo app");
 })
 // user router
 app.use("/user", userRoute);
