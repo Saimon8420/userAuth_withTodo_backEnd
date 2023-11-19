@@ -4,7 +4,7 @@ require("dotenv").config();
 const cors = require("cors");
 const bodyParser = require("body-parser");
 
-const port = process.env.DEV_PORT;
+const port = process.env.DEV_PORT || 5000;
 const userRoute = require("./router/userRouter");
 const todoRoute = require("./router/todoRouter");
 const dbConnection = require("./helper/dbConnect");
