@@ -18,6 +18,15 @@ const getAllUser = async (req, res, next) => {
 const userRegister = async (req, res) => {
     const { firstName, lastName, address, phone, email, password } = req.body;
 
+    const existEmail = await userModel.findOne({ email: email });
+    if (existEmail) {
+        return res.send({ status: 500, msg: "email already registered, try with another one" });
+    }
+
+    const existPhone = await userModel.findOne({ phone: phone });
+    if (existPhone) {
+        return res.send({ status: 500, msg: "phone number already registered, try with another one" });
+    }
     const hashedPass = await bcrypt.hash(password, saltRound);
     try {
         const newUser = new userModel({
