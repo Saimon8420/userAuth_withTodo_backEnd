@@ -1,4 +1,4 @@
-# UserAuth_with_TodoApp_Backend: goto [live site:](https://benevolent-bonbon-a47d48.netlify.app)
+# UserAuth_with_TodoApp_Backend: [goto live site:](https://benevolent-bonbon-a47d48.netlify.app)
 
 ## Packages & Technologies:
 * express js
