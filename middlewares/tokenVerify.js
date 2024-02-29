@@ -3,7 +3,7 @@ const { configDotenv } = require("dotenv");
 const userModel = require('../model/userModel');
 
 const verifyToken = async (req, res, next) => {
-    const authHeader = req.headers['authorization'];
+    const authHeader = req.headers['Authorization'];
     if (authHeader === undefined || authHeader.includes("undefined")) {
         res.send({
             status: 401,
