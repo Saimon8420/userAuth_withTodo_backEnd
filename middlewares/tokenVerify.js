@@ -3,7 +3,7 @@ const { configDotenv } = require("dotenv");
 const userModel = require('../model/userModel');
 
 const verifyToken = async (req, res, next) => {
-    const authHeader = req.headers['Authorization'];
+    const authHeader = req.headers['authorization'];
     if (authHeader === undefined || authHeader.includes("undefined")) {
         res.send({
             status: 401,
@@ -16,8 +16,9 @@ const verifyToken = async (req, res, next) => {
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
             const currentTime = new Date().getTime() / 1000;
             if (decoded?.exp > currentTime) {
-                const findUser = await userModel.findOne({ _id: decoded?.data });
+                const findUser = await userModel.findOne({ _id: decoded?.data }).select("-password");
                 req.userData = findUser;
+                req.accessToken = token;
                 req.expireStamp = decoded?.exp;
                 next();
             }

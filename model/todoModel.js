@@ -17,15 +17,11 @@ const todoSchema = new Schema({
         type: String,
         default: "incomplete",
     },
-    cratedOn: {
-        type: Date,
-        default: Date.now,
-    },
     createBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Users',
     }
-})
+}, { timestamps: true })
 
 const TodoModel = mongoose.model('Todos', todoSchema);
 module.exports = TodoModel;

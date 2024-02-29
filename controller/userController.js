@@ -69,9 +69,10 @@ const loginUser = async (req, res) => {
 const getUserData = async (req, res) => {
     try {
         const userData = req.userData;
+        const accessToken = req.accessToken;
         if (userData) {
             if (userData?._id) {
-                res.send({ status: 201, data: userData, expireTime: req.expireStamp });
+                res.send({ status: 201, data: userData, token: accessToken, expireTime: req.expireStamp });
             }
             else {
                 res.send({
