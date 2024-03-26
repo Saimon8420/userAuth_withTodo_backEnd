@@ -3,7 +3,7 @@ const removeCookies = async (req, res, next) => {
     await res.cookie('userAuth', '', {
         httpOnly: true,
         expires: new Date(0),
-        secure: false, // Change to true for HTTPS
+        secure: true, // Change to true for HTTPS
         sameSite: 'lax' // 'none' for HTTPS with proper security measures
     });
     next();

@@ -4,7 +4,7 @@ const setCookies = async (token, res) => {
     // Set the cookie with a more secure SameSite attribute (consider 'none' for HTTPS)
     await res.cookie('userAuth', token, {
         httpOnly: true,
-        secure: false, // Change to true for HTTPS
+        secure: true, // Change to true for HTTPS
         maxAge: expiryDate,
         sameSite: "lax" // 'none' for HTTPS with proper security measures
     });
