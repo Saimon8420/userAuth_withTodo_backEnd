@@ -6,7 +6,7 @@ const setCookies = async (token, res) => {
         httpOnly: true,
         secure: true, // Change to true for HTTPS
         maxAge: expiryDate,
-        sameSite: "lax" // 'none' for HTTPS with proper security measures
+        sameSite: "none" // 'none' for HTTPS with proper security measures
     });
 }
 
