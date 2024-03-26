@@ -11,7 +11,7 @@ const dbConnection = require("./helper/dbConnect");
 const cookieParser = require("cookie-parser");
 
 // Whitelisted origins for CORS (replace with your allowed origins)
-const allowedOrigins = ['https://benevolent-bonbon-a47d48.netlify.app/'];
+const allowedOrigins = ["https://benevolent-bonbon-a47d48.netlify.app/"];
 
 app.use(cors({
     origin: function (origin, callback) {
@@ -24,6 +24,14 @@ app.use(cors({
     },
     credentials: true
 }));
+
+const allowCrossDomain = function (req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    next();
+};
+app.use(allowCrossDomain);
 
 app.use(cookieParser());
 
