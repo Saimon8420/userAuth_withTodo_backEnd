@@ -63,7 +63,7 @@ const getEachTodo = async (req, res) => {
     } catch (error) {
         console.log(error);
     }
-}
+};
 
 const updateTodo = async (req, res) => {
     try {
@@ -90,6 +90,6 @@ const deleteTodo = async (req, res) => {
     } catch (error) {
         console.log(error);
     }
-}
+};
 
 module.exports = { createTodo, getAllTodo, getEachTodo, updateTodo, deleteTodo };

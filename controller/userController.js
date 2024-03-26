@@ -3,6 +3,7 @@ const userModel = require("../model/userModel");
 const saltRound = 10;
 const jwt = require('jsonwebtoken');
 const { configDotenv } = require("dotenv");
+const setCookies = require("../middlewares/setCookies");
 
 // for admin part
 const getAllUser = async (req, res, next) => {
@@ -12,7 +13,7 @@ const getAllUser = async (req, res, next) => {
     } catch (error) {
         console.log(error);
     }
-}
+};
 
 // for user
 const userRegister = async (req, res) => {
@@ -43,18 +44,22 @@ const userRegister = async (req, res) => {
     } catch (error) {
         console.log(error);
     }
-}
+};
 
 const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
         const findUser = await userModel.findOne({ email: email });
-        const matched = await bcrypt.compare(password, findUser.password);
+        const { email: userEmail, password: userPassword, firstName, address, lastName, phone } = findUser;
+        const matched = await bcrypt.compare(password, userPassword);
         if (matched) {
             const token = jwt.sign({
                 data: findUser._id,
-            }, process.env.JWT_SECRET, { expiresIn: "1h" });
-            res.send({ status: 200, msg: "user login successful", accessToken: token, userData: findUser });
+            }, process.env.JWT_SECRET, { expiresIn: "1hr" });
+            // set Cookies
+            setCookies(token, res);
+
+            res.send({ status: 200, msg: "user login successful", userData: { userEmail, firstName, lastName, address, phone, email: userEmail } });
         }
         else {
             console.log("password does not matched");
@@ -64,15 +69,14 @@ const loginUser = async (req, res) => {
     } catch (error) {
         console.log(error);
     }
-}
+};
 
 const getUserData = async (req, res) => {
     try {
         const userData = req.userData;
-        const accessToken = req.accessToken;
         if (userData) {
             if (userData?._id) {
-                res.send({ status: 201, data: userData, token: accessToken, expireTime: req.expireStamp });
+                res.send({ status: 201, data: userData });
             }
             else {
                 res.send({
@@ -90,7 +94,7 @@ const getUserData = async (req, res) => {
     } catch (error) {
         console.log(error);
     }
-}
+};
 
 const updateUser = async (req, res) => {
     try {
@@ -101,12 +105,12 @@ const updateUser = async (req, res) => {
                 const hashedPass = await bcrypt.hash(changedPass, saltRound);
                 const updatedUser = await userModel.findOneAndUpdate(userData._id, { firstName: firstName, lastName: lastName, phone: phone, address: address, password: hashedPass });
                 await updatedUser.save();
-                res.send({ status: 200, msg: "user updated successfully", userData: await userModel.findById(userData._id) });
+                res.send({ status: 200, msg: "user updated successfully", userData: await userModel.findById(userData._id).select("-password -_id") });
             }
             else {
                 const updatedUser = await userModel.findOneAndUpdate(userData._id, { firstName: firstName, lastName: lastName, phone: phone, address: address, password: unChangePass });
                 await updatedUser.save();
-                res.send({ status: 200, msg: "user updated successfully", userData: await userModel.findById(userData._id) });
+                res.send({ status: 200, msg: "user updated successfully", userData: await userModel.findById(userData._id).select("-password -_id") });
             }
         } else {
             res.send({
@@ -117,7 +121,11 @@ const updateUser = async (req, res) => {
     } catch (error) {
         console.log(error);
     }
-}
+};
+
+const userLoggedOut = (req, res) => {
+    res.send({ status: 201, msg: "user successfully logout" });
+};
 
 // if/when forget password
 // sending mail to user for reset password
@@ -146,7 +154,6 @@ const resetPassword = async (req, res) => {
         const { token, password } = req.body;
         if (token) {
             const decodedEmail = jwt.verify(token, process.env.JWT_SECRET_FORGET_PASS);
-            console.log(decodedEmail);
             const findUser = await userModel.findOne({ email: decodedEmail?.data });
             if (findUser) {
                 const hashedPass = await bcrypt.hash(password, saltRound);
@@ -176,4 +183,4 @@ const resetPassword = async (req, res) => {
     }
 }
 
-module.exports = { getAllUser, userRegister, loginUser, getUserData, updateUser, sendEmailForResetPass, resetPassword };
+module.exports = { getAllUser, userRegister, loginUser, getUserData, updateUser, sendEmailForResetPass, resetPassword, userLoggedOut };
