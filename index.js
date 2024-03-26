@@ -10,7 +10,7 @@ const todoRoute = require("./router/todoRouter");
 const dbConnection = require("./helper/dbConnect");
 const cookieParser = require("cookie-parser");
 
-const allowedOrigins = ["https://benevolent-bonbon-a47d48.netlify.app/", "http://localhost:5173"];
+const allowedOrigins = ["https://benevolent-bonbon-a47d48.netlify.app", "http://localhost:5173"];
 
 // Whitelisted origins for CORS (replace with your allowed origins)
 
