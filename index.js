@@ -14,13 +14,24 @@ const allowedOrigins = ["https://benevolent-bonbon-a47d48.netlify.app/", "http:/
 
 // Whitelisted origins for CORS (replace with your allowed origins)
 
+// app.use(cors({
+//     origin: function (origin, callback) {
+//         if (!origin) return callback(null, true);
+//         if (allowedOrigins.indexOf(origin) !== -1) {
+//             return callback(null, true);
+//         } else {
+//             return callback(new Error('Origin not allowed by CORS'));
+//         }
+//     },
+//     credentials: true
+// }));
+
 app.use(cors({
-    origin: function (origin, callback) {
-        if (!origin) return callback(null, true);
+    origin: (origin, callback) => {
         if (allowedOrigins.indexOf(origin) !== -1) {
-            return callback(null, true);
+            callback(null, true);
         } else {
-            return callback(new Error('Origin not allowed by CORS'));
+            callback(new Error('Origin not allowed by CORS'));
         }
     },
     credentials: true
