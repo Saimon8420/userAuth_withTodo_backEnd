@@ -4,8 +4,8 @@ const { configDotenv } = require("dotenv");
 
 const refreshToken = async (req, res, next) => {
     try {
-        const token = req.cookies?.userAuth;
-        if (token !== undefined) {
+        const token = req?.cookies?.userAuth;
+        if (token) {
             const decoded = await jwt.verify(token, process.env.JWT_SECRET);
             if (decoded?.data) {
                 const newToken = await jwt.sign({
@@ -22,9 +22,15 @@ const refreshToken = async (req, res, next) => {
             }
         }
         else {
+            await res.cookie('userAuth', '', {
+                httpOnly: true,
+                expires: new Date(0),
+                secure: false, // Change to true for HTTPS
+                sameSite: 'lax' // 'none' for HTTPS with proper security measures
+            });
             res.send({
                 status: 401,
-                msg: "Unauthorized",
+                msg: "Un-authenticate! Login Again.",
             });
         }
     } catch (error) {

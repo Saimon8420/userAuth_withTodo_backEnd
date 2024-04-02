@@ -123,8 +123,22 @@ const updateUser = async (req, res) => {
     }
 };
 
-const userLoggedOut = (req, res) => {
-    res.send({ status: 201, msg: "user successfully logout" });
+const userLoggedOut = async (req, res) => {
+    try {
+        // Clear the cookie by setting its expiration date to a past time
+        await res.cookie('userAuth', '', {
+            httpOnly: true,
+            expires: new Date(0),
+            secure: true, // Change to true for HTTPS
+            sameSite: 'lax' // 'none' for HTTPS with proper security measures
+        });
+
+        await res.send({ status: 201, msg: "user successfully logout" });
+
+    } catch (error) {
+        console.log(error.message);
+    }
+
 };
 
 // if/when forget password
